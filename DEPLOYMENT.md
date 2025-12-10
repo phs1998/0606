@@ -165,7 +165,32 @@
 - 已更新为正确的版本号：`@cloudflare/next-on-pages@^1.13.16`
 - 如果将来需要更新，可以运行 `npm view @cloudflare/next-on-pages versions` 查看可用版本
 
-### 7. Next.js 版本不兼容错误
+### 7. Cloudflare 使用缓存的依赖导致版本错误
+
+**症状**：即使 `package.json` 已经更新为正确的版本，Cloudflare Pages 仍然尝试安装旧版本（如 `next@^14.3.0`）。
+
+**原因**：Cloudflare Pages 使用了之前构建的依赖缓存。
+
+**解决方案**：
+
+**方法 1：清除构建缓存（推荐）**
+1. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com/)
+2. 进入 **Pages** → 项目 **0606**
+3. 点击 **Settings** → **Builds & deployments**
+4. 找到 **Clear build cache** 选项
+5. 点击 **Clear cache** 按钮
+6. 重新触发部署
+
+**方法 2：创建空提交强制重新构建**
+```bash
+git commit --allow-empty -m "强制重新构建以清除 Cloudflare 缓存"
+git push
+```
+
+**方法 3：修改构建命令强制清除缓存**
+在构建命令前添加 `rm -rf node_modules package-lock.json &&`（不推荐，会显著增加构建时间）
+
+### 8. Next.js 版本不兼容错误
 
 **原因**：`@cloudflare/next-on-pages@1.13.16` 需要 Next.js `>=14.3.0 && <=15.5.2`，但 Next.js 14.3.0 只有 canary 版本，没有稳定版本。
 
