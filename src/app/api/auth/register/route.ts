@@ -5,8 +5,37 @@ import { generateToken } from '@/lib/auth/jwt'
 import { validateUsername, emailSchema, passwordSchema } from '@/lib/utils/validation'
 import { successResponse, errorResponse } from '@/lib/utils/response'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
+    // 验证环境变量（记录详细信息以便调试）
+    const missingVars: string[] = []
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      missingVars.push('NEXT_PUBLIC_SUPABASE_URL')
+    }
+    if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      missingVars.push('NEXT_PUBLIC_SUPABASE_ANON_KEY')
+    }
+    if (!process.env.JWT_SECRET) {
+      missingVars.push('JWT_SECRET')
+    }
+    
+    if (missingVars.length > 0) {
+      console.error('缺少环境变量:', missingVars.join(', '))
+      console.error('当前环境:', {
+        NODE_ENV: process.env.NODE_ENV,
+        VERCEL: process.env.VERCEL,
+        VERCEL_ENV: process.env.VERCEL_ENV,
+      })
+      return errorResponse('服务器配置错误，请稍后重试', 'CONFIG_ERROR', 500)
+    }
+
+    // 检查是否使用了 service role key（推荐用于服务端操作）
+    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      console.warn('警告: 未设置 SUPABASE_SERVICE_ROLE_KEY，使用 anon key。这可能导致 RLS 策略问题。')
+    }
+
     const body = await request.json()
     const { username, email, password } = body
 
@@ -34,29 +63,45 @@ export async function POST(request: NextRequest) {
     }
 
     // 检查用户名是否已存在
-    const { data: existingUserByUsername } = await supabaseAdmin
+    const { data: existingUserByUsername, error: usernameCheckError } = await supabaseAdmin
       .from('users')
       .select('id')
       .eq('username', username)
-      .single()
+      .maybeSingle()
+
+    // 如果查询出错（非"未找到"错误），记录错误
+    if (usernameCheckError && usernameCheckError.code !== 'PGRST116') {
+      console.error('检查用户名错误:', usernameCheckError)
+    }
 
     if (existingUserByUsername) {
       return errorResponse('用户名已存在', 'USERNAME_EXISTS', 409)
     }
 
     // 检查邮箱是否已存在
-    const { data: existingUserByEmail } = await supabaseAdmin
+    const { data: existingUserByEmail, error: emailCheckError } = await supabaseAdmin
       .from('users')
       .select('id')
       .eq('email', email)
-      .single()
+      .maybeSingle()
+
+    // 如果查询出错（非"未找到"错误），记录错误
+    if (emailCheckError && emailCheckError.code !== 'PGRST116') {
+      console.error('检查邮箱错误:', emailCheckError)
+    }
 
     if (existingUserByEmail) {
       return errorResponse('邮箱已被注册', 'EMAIL_EXISTS', 409)
     }
 
     // 加密密码
-    const passwordHash = await hashPassword(password)
+    let passwordHash: string
+    try {
+      passwordHash = await hashPassword(password)
+    } catch (hashError) {
+      console.error('密码加密失败:', hashError)
+      return errorResponse('注册失败，请稍后重试', 'HASH_ERROR', 500)
+    }
 
     // 创建用户（registration_number会自动递增）
     const { data: newUser, error: userError } = await supabaseAdmin
@@ -69,24 +114,67 @@ export async function POST(request: NextRequest) {
       .select('id, username, email, registration_number, created_at')
       .single()
 
-    if (userError || !newUser) {
-      console.error('创建用户失败:', userError)
+    if (userError) {
+      const errorDetails = {
+        error: userError,
+        message: userError.message,
+        details: userError.details,
+        hint: userError.hint,
+        code: userError.code,
+        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL?.substring(0, 30) + '...',
+        hasServiceRoleKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      }
+      console.error('创建用户失败:', JSON.stringify(errorDetails, null, 2))
+      
+      // 处理特定的数据库错误
+      if (userError.code === '23505') { // 唯一约束违反
+        if (userError.message?.includes('username') || userError.message?.includes('users_username_key')) {
+          return errorResponse('用户名已存在', 'USERNAME_EXISTS', 409)
+        }
+        if (userError.message?.includes('email') || userError.message?.includes('users_email_key')) {
+          return errorResponse('邮箱已被注册', 'EMAIL_EXISTS', 409)
+        }
+      }
+      
+      // 处理 RLS 策略错误
+      if (userError.code === '42501' || userError.message?.includes('permission denied') || userError.message?.includes('RLS')) {
+        console.error('RLS 策略错误: 请确保设置了 SUPABASE_SERVICE_ROLE_KEY 或配置了正确的 RLS 策略')
+        return errorResponse('数据库权限错误，请联系管理员', 'PERMISSION_ERROR', 500)
+      }
+      
+      return errorResponse('注册失败，请稍后重试', 'DATABASE_ERROR', 500)
+    }
+
+    if (!newUser) {
+      console.error('创建用户失败: 返回数据为空')
       return errorResponse('注册失败，请稍后重试', 'DATABASE_ERROR', 500)
     }
 
     // 创建用户资料
-    await supabaseAdmin
+    const { error: profileError } = await supabaseAdmin
       .from('user_profiles')
       .insert({
         user_id: newUser.id,
       })
 
+    if (profileError) {
+      console.error('创建用户资料失败:', profileError)
+      // 即使资料创建失败，用户已经创建，所以继续执行
+      // 可以考虑回滚用户创建，但为了简化，这里只记录错误
+    }
+
     // 生成JWT token
-    const token = generateToken({
-      userId: newUser.id,
-      email: newUser.email,
-      username: newUser.username,
-    })
+    let token: string
+    try {
+      token = generateToken({
+        userId: newUser.id,
+        email: newUser.email,
+        username: newUser.username,
+      })
+    } catch (tokenError) {
+      console.error('生成 token 失败:', tokenError)
+      return errorResponse('注册失败，请稍后重试', 'TOKEN_ERROR', 500)
+    }
 
     // 返回用户信息和token，并设置Cookie
     const response = successResponse({
@@ -101,17 +189,30 @@ export async function POST(request: NextRequest) {
     })
 
     // Set token in HTTP-only cookie
+    // 在 Vercel 生产环境中，secure 应该为 true（因为使用 HTTPS）
+    const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1'
     response.cookies.set('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isProduction, // Vercel 使用 HTTPS，所以 secure 应该为 true
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7, // 7 days
       path: '/',
     })
 
     return response
-  } catch (error) {
-    console.error('注册错误:', error)
+  } catch (error: any) {
+    console.error('注册错误:', {
+      error,
+      message: error?.message,
+      stack: error?.stack,
+      name: error?.name,
+    })
+    
+    // 处理 JSON 解析错误
+    if (error instanceof SyntaxError) {
+      return errorResponse('请求格式错误', 'INVALID_REQUEST', 400)
+    }
+    
     return errorResponse('服务器错误，请稍后重试', 'SERVER_ERROR', 500)
   }
 }

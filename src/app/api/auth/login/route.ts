@@ -4,6 +4,8 @@ import { verifyPassword } from '@/lib/auth/password'
 import { generateToken } from '@/lib/auth/jwt'
 import { successResponse, errorResponse } from '@/lib/utils/response'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
