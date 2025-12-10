@@ -122,6 +122,37 @@
 
 这些命令会立即返回成功（退出码 0），不会执行任何实际部署操作，因为 Cloudflare Pages 会在构建完成后自动处理部署。
 
+### 5. 部署后显示 "Hello World" 而不是 Next.js 应用
+
+**原因**：Cloudflare Pages 没有正确识别 Next.js 应用的路由，可能因为：
+- 根目录或 `public/` 目录下有 `index.html` 文件覆盖了 Next.js 路由
+- 缺少 `functions/_routes.json` 配置文件
+
+**解决方案**：
+
+1. **检查并删除冲突的 index.html**：
+   - 检查项目根目录下是否有 `index.html`，如果有请删除或重命名（如 `index.html.bak`）
+   - 检查 `public/` 目录下是否有 `index.html`，如果有也请移除
+
+2. **创建 functions/_routes.json 配置**：
+   在项目根目录下创建 `functions` 文件夹（如果不存在），然后在其中创建 `_routes.json` 文件：
+   ```json
+   {
+     "version": 1,
+     "include": ["/*"],
+     "exclude": ["/static/*"]
+   }
+   ```
+   
+   这个配置文件告诉 Cloudflare Pages：
+   - `"include": ["/*"]`：所有请求都由 Next.js 应用处理
+   - `"exclude": ["/static/*"]`：排除静态资源路径，提升性能
+
+3. **重新部署**：
+   - 提交更改到 Git 仓库
+   - Cloudflare Pages 会自动重新构建和部署
+   - 或者手动触发重新部署
+
 ## 注意事项
 
 1. **Git 集成是推荐方式**：连接 GitHub/GitLab 仓库后，每次推送代码都会自动构建和部署
