@@ -3,6 +3,8 @@ import { supabaseAdmin } from '@/lib/supabase/server'
 import { requireAuth } from '@/lib/auth/middleware'
 import { successResponse, errorResponse } from '@/lib/utils/response'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     const currentUser = await requireAuth(request)
@@ -31,6 +33,9 @@ export async function GET(request: NextRequest) {
     return errorResponse('服务器错误，请稍后重试', 'SERVER_ERROR', 500)
   }
 }
+
+
+
 
 
 

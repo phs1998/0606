@@ -18,3 +18,7 @@ CREATE INDEX IF NOT EXISTS idx_comments_parent_comment_id ON comments(parent_com
 
 
 
+
+
+
+

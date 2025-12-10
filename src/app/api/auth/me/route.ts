@@ -3,6 +3,8 @@ import { supabaseAdmin } from '@/lib/supabase/server'
 import { requireAuth } from '@/lib/auth/middleware'
 import { successResponse, errorResponse } from '@/lib/utils/response'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     // 验证用户身份

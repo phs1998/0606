@@ -3,6 +3,8 @@ import { supabaseAdmin } from '@/lib/supabase/server'
 import { verifyToken, extractTokenFromHeader } from '@/lib/auth/jwt'
 import { successResponse, errorResponse } from '@/lib/utils/response'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     const authHeader = request.headers.get('authorization')
