@@ -1,0 +1,533 @@
+/* 蒸汽波音乐播放器样式 */
+
+.vapor-music-player {
+  font-family: 'Courier New', 'MS Sans Serif', monospace;
+  user-select: none;
+  pointer-events: auto;
+}
+
+.vapor-player-container {
+  background: #c0c0c0;
+  border: 2px outset #c0c0c0;
+  box-shadow: 
+    inset -1px -1px 0px #000,
+    inset 1px 1px 0px #fff,
+    0 8px 32px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  position: relative;
+  image-rendering: pixelated;
+}
+
+/* CRT凸面显示效果 */
+.vapor-player-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(ellipse at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%),
+    radial-gradient(ellipse at 50% 50%, transparent 0%, rgba(0, 0, 0, 0.1) 100%);
+  pointer-events: none;
+  z-index: 10;
+  border-radius: 2px;
+}
+
+/* 网格纹理背景 */
+.vapor-player-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.03) 2px, rgba(0, 0, 0, 0.03) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0, 0, 0, 0.03) 2px, rgba(0, 0, 0, 0.03) 4px);
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.4;
+}
+
+/* 标题栏 */
+.vapor-player-header {
+  background: linear-gradient(180deg, #0a246a 0%, #000080 100%);
+  color: white;
+  padding: 6px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #000;
+  position: relative;
+  z-index: 11;
+  cursor: move;
+}
+
+.vapor-player-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.vapor-player-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.vapor-player-minimize,
+.vapor-player-close {
+  width: 18px;
+  height: 16px;
+  border: 1px outset #c0c0c0;
+  background: #c0c0c0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: bold;
+  color: #000;
+  line-height: 1;
+  padding: 0;
+  position: relative;
+  z-index: 12;
+}
+
+.vapor-player-minimize:active,
+.vapor-player-close:active {
+  border: 1px inset #c0c0c0;
+}
+
+/* 频谱可视化 */
+.vapor-player-spectrum {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+  height: 60px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 2;
+  margin: 4px;
+  border: 1px inset #808080;
+}
+
+.vapor-spectrum-bar {
+  width: 8px;
+  min-height: 5px;
+  border-radius: 2px 2px 0 0;
+  transition: height 0.1s ease;
+}
+
+/* 曲目信息 */
+.vapor-player-track-info {
+  padding: 12px;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  background: rgba(192, 192, 192, 0.5);
+  margin: 4px;
+  border: 1px inset #808080;
+}
+
+.vapor-track-name {
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--vapor-pink);
+  text-shadow: 0 0 10px var(--vapor-pink);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vapor-track-artist {
+  font-size: 11px;
+  color: var(--vapor-cyan);
+  text-shadow: 0 0 5px var(--vapor-cyan);
+}
+
+/* 进度条 */
+.vapor-player-progress {
+  padding: 8px 12px;
+  position: relative;
+  z-index: 2;
+}
+
+.vapor-progress-slider {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #808080;
+  border: 1px inset #808080;
+  outline: none;
+  cursor: pointer;
+  margin-bottom: 6px;
+}
+
+.vapor-progress-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: var(--vapor-pink);
+  border: 1px solid #fff;
+  cursor: pointer;
+  box-shadow: 0 0 5px var(--vapor-pink);
+}
+
+.vapor-progress-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: var(--vapor-pink);
+  border: 1px solid #fff;
+  cursor: pointer;
+  box-shadow: 0 0 5px var(--vapor-pink);
+}
+
+.vapor-progress-time {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+}
+
+/* 控制按钮 */
+.vapor-player-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  position: relative;
+  z-index: 2;
+}
+
+.vapor-player-btn {
+  width: 36px;
+  height: 36px;
+  border: 2px outset #c0c0c0;
+  background: #c0c0c0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.1s ease;
+  position: relative;
+}
+
+.vapor-player-btn:active {
+  border: 2px inset #c0c0c0;
+}
+
+.vapor-player-btn:hover {
+  background: #d0d0d0;
+}
+
+/* 播放按钮 - 霓虹脉冲动画 */
+.vapor-play-btn {
+  width: 48px;
+  height: 48px;
+  font-size: 20px;
+  background: linear-gradient(180deg, #c0c0c0 0%, #808080 100%);
+  box-shadow: 
+    inset -1px -1px 0px #000,
+    inset 1px 1px 0px #fff;
+}
+
+.vapor-play-btn.playing {
+  animation: neon-pulse 2s ease-in-out infinite;
+  box-shadow: 
+    inset -1px -1px 0px #000,
+    inset 1px 1px 0px #fff,
+    0 0 10px var(--vapor-pink),
+    0 0 20px var(--vapor-pink);
+}
+
+@keyframes neon-pulse {
+  0%, 100% {
+    box-shadow: 
+      inset -1px -1px 0px #000,
+      inset 1px 1px 0px #fff,
+      0 0 10px var(--vapor-pink),
+      0 0 20px var(--vapor-pink);
+  }
+  50% {
+    box-shadow: 
+      inset -1px -1px 0px #000,
+      inset 1px 1px 0px #fff,
+      0 0 15px var(--vapor-cyan),
+      0 0 30px var(--vapor-cyan);
+  }
+}
+
+@keyframes tape-progress {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 200% 0%;
+  }
+}
+
+.vapor-player-btn.active {
+  background: #000080;
+  color: white;
+  border: 2px inset #c0c0c0;
+}
+
+.vapor-player-btn.muted {
+  opacity: 0.6;
+}
+
+/* 音量控制 */
+.vapor-player-volume {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  position: relative;
+  z-index: 2;
+}
+
+.vapor-volume-slider {
+  flex: 1;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #808080;
+  border: 1px inset #808080;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+}
+
+/* 音量滑块RGB分离效果 */
+.vapor-volume-slider:hover {
+  filter: 
+    drop-shadow(1px 0 0 rgba(255, 0, 255, 0.5))
+    drop-shadow(-1px 0 0 rgba(0, 255, 255, 0.5));
+}
+
+.vapor-volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: var(--vapor-cyan);
+  border: 1px solid #fff;
+  cursor: pointer;
+  box-shadow: 0 0 5px var(--vapor-cyan);
+}
+
+.vapor-volume-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: var(--vapor-cyan);
+  border: 1px solid #fff;
+  cursor: pointer;
+  box-shadow: 0 0 5px var(--vapor-cyan);
+}
+
+.vapor-volume-value {
+  font-size: 10px;
+  min-width: 35px;
+  text-align: right;
+}
+
+/* 曲目列表 */
+.vapor-player-playlist {
+  margin: 4px;
+  border: 1px inset #808080;
+  background: rgba(192, 192, 192, 0.3);
+  max-height: 150px;
+  overflow-y: auto;
+  position: relative;
+  z-index: 2;
+}
+
+.vapor-playlist-header {
+  background: linear-gradient(180deg, #808080 0%, #606060 100%);
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: bold;
+  color: #000;
+  border-bottom: 1px solid #000;
+  text-transform: uppercase;
+}
+
+.vapor-playlist-items {
+  padding: 4px;
+}
+
+.vapor-playlist-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  margin: 2px 0;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  font-size: 10px;
+  transition: all 0.1s ease;
+  color: #000;
+}
+
+.vapor-playlist-item:hover {
+  background: rgba(0, 0, 128, 0.3);
+  border: 1px dotted #000080;
+  color: white;
+}
+
+.vapor-playlist-item.active {
+  background: #000080;
+  color: white;
+  border: 1px solid #fff;
+  font-weight: bold;
+}
+
+.vapor-playlist-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--vapor-pink) 0%,
+    var(--vapor-cyan) 25%,
+    var(--vapor-purple) 50%,
+    var(--vapor-blue) 75%,
+    var(--vapor-pink) 100%
+  );
+  background-size: 200% 100%;
+  animation: tape-progress 2s linear infinite;
+  box-shadow: 0 0 5px var(--vapor-pink);
+}
+
+.vapor-playlist-track-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: bold;
+}
+
+.vapor-playlist-artist {
+  font-size: 9px;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+/* VHS故障效果 */
+.vapor-music-player.vhs-glitch {
+  animation: vhs-glitch-effect 0.5s ease-in-out;
+}
+
+@keyframes vhs-glitch-effect {
+  0%, 100% {
+    transform: translate(0);
+    filter: hue-rotate(0deg);
+  }
+  10% {
+    transform: translate(-2px, 2px);
+    filter: hue-rotate(90deg);
+  }
+  20% {
+    transform: translate(2px, -2px);
+    filter: hue-rotate(180deg);
+  }
+  30% {
+    transform: translate(-2px, -2px);
+    filter: hue-rotate(270deg);
+  }
+  40% {
+    transform: translate(2px, 2px);
+    filter: hue-rotate(360deg);
+  }
+  50% {
+    transform: translate(-1px, 1px);
+    filter: hue-rotate(45deg);
+  }
+  60% {
+    transform: translate(1px, -1px);
+    filter: hue-rotate(135deg);
+  }
+  70% {
+    transform: translate(-1px, -1px);
+    filter: hue-rotate(225deg);
+  }
+  80% {
+    transform: translate(1px, 1px);
+    filter: hue-rotate(315deg);
+  }
+  90% {
+    transform: translate(0);
+    filter: hue-rotate(0deg);
+  }
+}
+
+/* 最小化状态 */
+.vapor-music-player.minimized .vapor-player-container {
+  max-height: 30px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .vapor-music-player {
+    width: calc(100% - 40px) !important;
+    right: 20px !important;
+    left: 20px !important;
+  }
+
+  .vapor-player-container {
+    font-size: 10px;
+  }
+
+  .vapor-player-buttons {
+    gap: 4px;
+  }
+
+  .vapor-player-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .vapor-play-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+}
+
+/* 滚动条样式 */
+.vapor-player-playlist::-webkit-scrollbar {
+  width: 8px;
+}
+
+.vapor-player-playlist::-webkit-scrollbar-track {
+  background: #808080;
+  border: 1px inset #808080;
+}
+
+.vapor-player-playlist::-webkit-scrollbar-thumb {
+  background: #c0c0c0;
+  border: 1px outset #c0c0c0;
+}
+
+.vapor-player-playlist::-webkit-scrollbar-thumb:hover {
+  background: #d0d0d0;
+}
+

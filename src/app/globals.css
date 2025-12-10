@@ -1,0 +1,1046 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   蒸汽波主题变量 (Vaporwave Theme Variables)
+   ============================================ */
+:root {
+  /* 霓虹色调 - 粉紫渐变 */
+  --vapor-pink: #ff00ff;
+  --vapor-pink-bright: #ff66ff;
+  --vapor-pink-dim: #cc00cc;
+  
+  /* 霓虹色调 - 蓝绿渐变 */
+  --vapor-cyan: #00ffff;
+  --vapor-cyan-bright: #66ffff;
+  --vapor-cyan-dim: #00cccc;
+  
+  /* 霓虹色调 - 紫色系 */
+  --vapor-purple: #9d00ff;
+  --vapor-purple-bright: #cc66ff;
+  --vapor-purple-dim: #7a00cc;
+  
+  /* 霓虹色调 - 蓝色系 */
+  --vapor-blue: #0066ff;
+  --vapor-blue-bright: #3399ff;
+  --vapor-blue-dim: #0052cc;
+  
+  /* 荧光色 */
+  --vapor-neon-green: #39ff14;
+  --vapor-neon-yellow: #ffff00;
+  --vapor-neon-orange: #ff6600;
+  
+  /* 渐变组合 */
+  --vapor-gradient-pink-purple: linear-gradient(135deg, var(--vapor-pink), var(--vapor-purple));
+  --vapor-gradient-cyan-blue: linear-gradient(135deg, var(--vapor-cyan), var(--vapor-blue));
+  --vapor-gradient-rainbow: linear-gradient(135deg, 
+    var(--vapor-pink), 
+    var(--vapor-purple), 
+    var(--vapor-blue), 
+    var(--vapor-cyan)
+  );
+  
+  /* 网格背景 */
+  --grid-bg: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(255, 0, 255, 0.1) 10px,
+    rgba(0, 255, 255, 0.1) 20px
+  );
+  
+  --grid-bg-dense: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 5px,
+    rgba(255, 0, 255, 0.15) 5px,
+    rgba(0, 255, 255, 0.15) 10px
+  );
+  
+  /* VHS故障效果 - 扫描线 */
+  --scanlines: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15) 0px,
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  
+  /* VHS故障效果 - 色差 */
+  --vhs-chroma: 
+    drop-shadow(2px 0 0 rgba(255, 0, 255, 0.5))
+    drop-shadow(-2px 0 0 rgba(0, 255, 255, 0.5));
+  
+  /* 玻璃拟态效果 */
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-blur: blur(10px);
+  
+  /* 毛玻璃效果 */
+  --frosted-glass: rgba(255, 255, 255, 0.15);
+  --frosted-blur: blur(20px);
+  
+  /* 发光边框 */
+  --glow-pink: 0 0 10px var(--vapor-pink), 0 0 20px var(--vapor-pink), 0 0 30px var(--vapor-pink);
+  --glow-cyan: 0 0 10px var(--vapor-cyan), 0 0 20px var(--vapor-cyan), 0 0 30px var(--vapor-cyan);
+  --glow-purple: 0 0 10px var(--vapor-purple), 0 0 20px var(--vapor-purple), 0 0 30px var(--vapor-purple);
+  --glow-rainbow: 
+    0 0 10px var(--vapor-pink),
+    0 0 20px var(--vapor-purple),
+    0 0 30px var(--vapor-blue),
+    0 0 40px var(--vapor-cyan);
+  
+  /* 复古背景色 */
+  --retro-bg-dark: #1a0a2e;
+  --retro-bg-darker: #0f0521;
+  --retro-bg-light: #2d1b4e;
+  
+  /* 文字颜色 */
+  --text-neon-pink: var(--vapor-pink);
+  --text-neon-cyan: var(--vapor-cyan);
+  --text-neon-purple: var(--vapor-purple);
+  --text-retro: #e0e0e0;
+  
+  /* 阴影效果 */
+  --shadow-neon-pink: 0 0 5px var(--vapor-pink), 0 0 10px var(--vapor-pink), 0 0 15px var(--vapor-pink);
+  --shadow-neon-cyan: 0 0 5px var(--vapor-cyan), 0 0 10px var(--vapor-cyan), 0 0 15px var(--vapor-cyan);
+  --shadow-neon-purple: 0 0 5px var(--vapor-purple), 0 0 10px var(--vapor-purple), 0 0 15px var(--vapor-purple);
+}
+
+/* ============================================
+   蒸汽波动画效果
+   ============================================ */
+
+/* 霓虹闪烁动画 */
+@keyframes neon-flicker {
+  0%, 100% { opacity: 1; }
+  41.99% { opacity: 1; }
+  42% { opacity: 0.8; }
+  43% { opacity: 1; }
+  45.99% { opacity: 1; }
+  46% { opacity: 0.9; }
+  46.5% { opacity: 1; }
+  47.99% { opacity: 1; }
+  48% { opacity: 0.7; }
+  48.5% { opacity: 1; }
+}
+
+/* 渐变流动动画 */
+@keyframes gradient-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* VHS故障效果动画 */
+@keyframes vhs-glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+  100% { transform: translate(0); }
+}
+
+/* 扫描线移动动画 */
+@keyframes scanline-move {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(4px); }
+}
+
+/* 发光脉冲动画 */
+@keyframes glow-pulse {
+  0%, 100% { 
+    box-shadow: var(--glow-pink);
+    opacity: 1;
+  }
+  50% { 
+    box-shadow: var(--glow-cyan);
+    opacity: 0.8;
+  }
+}
+
+/* 彩虹渐变流动 */
+@keyframes rainbow-gradient {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* ============================================
+   蒸汽波实用类
+   ============================================ */
+
+/* 玻璃拟态效果 */
+.vapor-glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+/* 毛玻璃效果 */
+.vapor-frosted {
+  background: var(--frosted-glass);
+  backdrop-filter: var(--frosted-blur);
+  -webkit-backdrop-filter: var(--frosted-blur);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* 霓虹文字效果 */
+.vapor-neon-text {
+  color: var(--vapor-pink);
+  text-shadow: var(--shadow-neon-pink);
+  animation: neon-flicker 3s infinite;
+}
+
+.vapor-neon-text-cyan {
+  color: var(--vapor-cyan);
+  text-shadow: var(--shadow-neon-cyan);
+  animation: neon-flicker 3s infinite;
+}
+
+.vapor-neon-text-purple {
+  color: var(--vapor-purple);
+  text-shadow: var(--shadow-neon-purple);
+  animation: neon-flicker 3s infinite;
+}
+
+/* 发光边框 */
+.vapor-glow-border {
+  border: 2px solid var(--vapor-pink);
+  box-shadow: var(--glow-pink);
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.vapor-glow-border-cyan {
+  border: 2px solid var(--vapor-cyan);
+  box-shadow: var(--glow-cyan);
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* 渐变背景 */
+.vapor-gradient-bg {
+  background: var(--vapor-gradient-rainbow);
+  background-size: 200% 200%;
+  animation: gradient-flow 5s ease infinite;
+}
+
+/* VHS故障效果 */
+.vapor-vhs-effect {
+  filter: var(--vhs-chroma);
+  animation: vhs-glitch 0.3s infinite;
+}
+
+/* 扫描线覆盖层 */
+.vapor-scanlines::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--scanlines);
+  pointer-events: none;
+  animation: scanline-move 0.1s linear infinite;
+}
+
+/* 网格背景 */
+.vapor-grid-bg {
+  background: var(--grid-bg);
+  background-color: var(--retro-bg-dark);
+}
+
+.vapor-grid-bg-dense {
+  background: var(--grid-bg-dense);
+  background-color: var(--retro-bg-dark);
+}
+
+/* 复古Windows 95/98风格按钮 */
+.vapor-retro-button {
+  background: linear-gradient(180deg, #c0c0c0 0%, #808080 100%);
+  border: 2px outset #c0c0c0;
+  box-shadow: 
+    inset -1px -1px 0px #000,
+    inset 1px 1px 0px #fff;
+  font-family: 'MS Sans Serif', sans-serif;
+  text-transform: uppercase;
+  transition: all 0.1s ease;
+}
+
+.vapor-retro-button:active {
+  border: 2px inset #c0c0c0;
+  box-shadow: 
+    inset 1px 1px 0px #000,
+    inset -1px -1px 0px #fff;
+}
+
+/* 故障艺术效果 - 文字抖动和颜色偏移 */
+@keyframes glitch-text {
+  0% {
+    transform: translate(0);
+    text-shadow: 
+      2px 0 0 var(--vapor-pink),
+      -2px 0 0 var(--vapor-cyan);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+    text-shadow: 
+      -2px 0 0 var(--vapor-pink),
+      2px 0 0 var(--vapor-cyan);
+  }
+  40% {
+    transform: translate(-2px, -2px);
+    text-shadow: 
+      2px 0 0 var(--vapor-cyan),
+      -2px 0 0 var(--vapor-purple);
+  }
+  60% {
+    transform: translate(2px, 2px);
+    text-shadow: 
+      -2px 0 0 var(--vapor-purple),
+      2px 0 0 var(--vapor-pink);
+  }
+  80% {
+    transform: translate(2px, -2px);
+    text-shadow: 
+      2px 0 0 var(--vapor-pink),
+      -2px 0 0 var(--vapor-cyan);
+  }
+  100% {
+    transform: translate(0);
+    text-shadow: 
+      2px 0 0 var(--vapor-pink),
+      -2px 0 0 var(--vapor-cyan);
+  }
+}
+
+.vapor-glitch-hover {
+  transition: all 0.3s ease;
+}
+
+.vapor-glitch-hover:hover {
+  animation: glitch-text 0.3s infinite;
+  filter: var(--vhs-chroma);
+}
+
+/* 荧光色渐变文字 */
+.vapor-gradient-text {
+  background: var(--vapor-gradient-rainbow);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-flow 3s ease infinite;
+}
+
+.vapor-gradient-text-pink-cyan {
+  background: linear-gradient(135deg, var(--vapor-pink), var(--vapor-cyan));
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-flow 3s ease infinite;
+}
+
+/* 导航栏扫描线效果 */
+.vapor-navbar-scanlines {
+  position: relative;
+}
+
+.vapor-navbar-scanlines::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--scanlines);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* ============================================
+   个人主页蒸汽波样式
+   ============================================ */
+
+/* CRT扫描线效果 - 用于头像 */
+.vapor-crt-scanlines {
+  position: relative;
+  overflow: hidden;
+}
+
+.vapor-crt-scanlines::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--scanlines);
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0.3;
+  animation: scanline-move 0.1s linear infinite;
+}
+
+/* 霓虹灯管字体 */
+@keyframes neon-tube-flicker {
+  0%, 100% { 
+    opacity: 1;
+    text-shadow: 
+      0 0 5px var(--vapor-pink),
+      0 0 10px var(--vapor-pink),
+      0 0 15px var(--vapor-pink),
+      0 0 20px var(--vapor-pink),
+      0 0 35px var(--vapor-pink),
+      0 0 40px var(--vapor-pink);
+  }
+  50% { 
+    opacity: 0.8;
+    text-shadow: 
+      0 0 2px var(--vapor-pink),
+      0 0 5px var(--vapor-pink),
+      0 0 8px var(--vapor-pink),
+      0 0 12px var(--vapor-pink),
+      0 0 18px var(--vapor-pink),
+      0 0 25px var(--vapor-pink);
+  }
+}
+
+.vapor-neon-tube {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  letter-spacing: 3px;
+  color: var(--vapor-pink);
+  animation: neon-tube-flicker 2s ease-in-out infinite;
+  text-transform: uppercase;
+}
+
+/* 复古Windows窗口样式 */
+.vapor-retro-window {
+  background: linear-gradient(180deg, #c0c0c0 0%, #808080 100%);
+  border: 2px outset #c0c0c0;
+  box-shadow: 
+    inset -1px -1px 0px #000,
+    inset 1px 1px 0px #fff,
+    0 0 20px rgba(0, 0, 0, 0.3);
+  font-family: 'MS Sans Serif', sans-serif;
+}
+
+.vapor-retro-window-header {
+  background: linear-gradient(180deg, #0a246a 0%, #000080 100%);
+  color: white;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #000;
+  text-transform: uppercase;
+}
+
+.vapor-retro-window-controls {
+  display: flex;
+  gap: 2px;
+}
+
+.vapor-retro-window-button {
+  width: 16px;
+  height: 14px;
+  border: 1px outset #c0c0c0;
+  background: #c0c0c0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  color: #000;
+  line-height: 1;
+}
+
+.vapor-retro-window-button:active {
+  border: 1px inset #c0c0c0;
+}
+
+.vapor-retro-window-content {
+  padding: 12px;
+  background: #ffffff;
+  color: #000000;
+  font-size: 12px;
+  line-height: 1.5;
+  min-height: 60px;
+}
+
+/* 浮动元素动画 */
+@keyframes float-slow {
+  0%, 100% { 
+    transform: translateY(0) rotate(0deg);
+  }
+  50% { 
+    transform: translateY(-20px) rotate(5deg);
+  }
+}
+
+@keyframes float-fast {
+  0%, 100% { 
+    transform: translateY(0) rotate(0deg);
+  }
+  50% { 
+    transform: translateY(-30px) rotate(-5deg);
+  }
+}
+
+.vapor-floating-element {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.6;
+  filter: drop-shadow(0 0 5px var(--vapor-pink));
+}
+
+.vapor-floating-slow {
+  animation: float-slow 4s ease-in-out infinite;
+}
+
+.vapor-floating-fast {
+  animation: float-fast 3s ease-in-out infinite;
+}
+
+/* 低保真噪点滤镜 */
+@keyframes noise {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-5%, -10%); }
+  20% { transform: translate(-15%, 5%); }
+  30% { transform: translate(7%, -25%); }
+  40% { transform: translate(-5%, 25%); }
+  50% { transform: translate(-15%, 10%); }
+  60% { transform: translate(15%, 0%); }
+  70% { transform: translate(0%, 15%); }
+  80% { transform: translate(3%, 35%); }
+  90% { transform: translate(-10%, 10%); }
+}
+
+.vapor-lo-fi-noise {
+  position: relative;
+}
+
+.vapor-lo-fi-noise::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.03) 0px, transparent 1px, transparent 2px, rgba(0, 0, 0, 0.03) 3px),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.03) 0px, transparent 1px, transparent 2px, rgba(0, 0, 0, 0.03) 3px);
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.4;
+  animation: noise 0.5s steps(8) infinite;
+  mix-blend-mode: overlay;
+}
+
+/* ============================================
+   文章卡片蒸汽波样式
+   ============================================ */
+
+/* 渐变色边框脉冲动画 */
+@keyframes border-pulse {
+  0%, 100% {
+    border-color: var(--vapor-pink);
+    box-shadow: 
+      0 0 10px var(--vapor-pink),
+      0 0 20px var(--vapor-pink),
+      inset 0 0 10px var(--vapor-pink);
+  }
+  25% {
+    border-color: var(--vapor-purple);
+    box-shadow: 
+      0 0 10px var(--vapor-purple),
+      0 0 20px var(--vapor-purple),
+      inset 0 0 10px var(--vapor-purple);
+  }
+  50% {
+    border-color: var(--vapor-blue);
+    box-shadow: 
+      0 0 10px var(--vapor-blue),
+      0 0 20px var(--vapor-blue),
+      inset 0 0 10px var(--vapor-blue);
+  }
+  75% {
+    border-color: var(--vapor-cyan);
+    box-shadow: 
+      0 0 10px var(--vapor-cyan),
+      0 0 20px var(--vapor-cyan),
+      inset 0 0 10px var(--vapor-cyan);
+  }
+}
+
+.vapor-article-card-border {
+  border: 2px solid var(--vapor-pink);
+  animation: border-pulse 3s ease-in-out infinite;
+}
+
+/* VHS故障效果 - 用于标题 */
+@keyframes vhs-glitch-title {
+  0% {
+    transform: translate(0);
+    text-shadow: 
+      2px 0 0 var(--vapor-pink),
+      -2px 0 0 var(--vapor-cyan);
+  }
+  20% {
+    transform: translate(-2px, 1px);
+    text-shadow: 
+      -2px 0 0 var(--vapor-pink),
+      2px 0 0 var(--vapor-cyan);
+  }
+  40% {
+    transform: translate(2px, -1px);
+    text-shadow: 
+      2px 0 0 var(--vapor-cyan),
+      -2px 0 0 var(--vapor-purple);
+  }
+  60% {
+    transform: translate(-1px, 2px);
+    text-shadow: 
+      -2px 0 0 var(--vapor-purple),
+      2px 0 0 var(--vapor-pink);
+  }
+  80% {
+    transform: translate(1px, -2px);
+    text-shadow: 
+      2px 0 0 var(--vapor-pink),
+      -2px 0 0 var(--vapor-cyan);
+  }
+  100% {
+    transform: translate(0);
+    text-shadow: 
+      2px 0 0 var(--vapor-pink),
+      -2px 0 0 var(--vapor-cyan);
+  }
+}
+
+.vapor-vhs-title {
+  animation: vhs-glitch-title 4s ease-in-out infinite;
+  filter: var(--vhs-chroma);
+}
+
+/* 复古终端文字 */
+.vapor-terminal-text {
+  font-family: 'Courier New', 'Consolas', monospace;
+  color: #39ff14; /* 经典终端绿色 */
+  text-shadow: 
+    0 0 5px #39ff14,
+    0 0 10px #39ff14;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.vapor-terminal-text-cyan {
+  font-family: 'Courier New', 'Consolas', monospace;
+  color: var(--vapor-cyan);
+  text-shadow: 
+    0 0 5px var(--vapor-cyan),
+    0 0 10px var(--vapor-cyan);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* 老式数字时钟样式 */
+.vapor-digital-clock {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  color: #ff0080;
+  text-shadow: 
+    0 0 5px #ff0080,
+    0 0 10px #ff0080,
+    0 0 15px #ff0080;
+  font-size: 11px;
+  letter-spacing: 1px;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 4px 8px;
+  border: 1px solid #ff0080;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+/* RGB分离故障动画 - 悬停时 */
+@keyframes rgb-separation {
+  0% {
+    transform: translate(0);
+    filter: 
+      drop-shadow(2px 0 0 rgba(255, 0, 255, 0.5))
+      drop-shadow(-2px 0 0 rgba(0, 255, 255, 0.5));
+  }
+  25% {
+    transform: translate(-3px, 0);
+    filter: 
+      drop-shadow(4px 0 0 rgba(255, 0, 255, 0.8))
+      drop-shadow(-4px 0 0 rgba(0, 255, 255, 0.8));
+  }
+  50% {
+    transform: translate(3px, 0);
+    filter: 
+      drop-shadow(-4px 0 0 rgba(255, 0, 255, 0.8))
+      drop-shadow(4px 0 0 rgba(0, 255, 255, 0.8));
+  }
+  75% {
+    transform: translate(-2px, 0);
+    filter: 
+      drop-shadow(3px 0 0 rgba(255, 0, 255, 0.6))
+      drop-shadow(-3px 0 0 rgba(0, 255, 255, 0.6));
+  }
+  100% {
+    transform: translate(0);
+    filter: 
+      drop-shadow(2px 0 0 rgba(255, 0, 255, 0.5))
+      drop-shadow(-2px 0 0 rgba(0, 255, 255, 0.5));
+  }
+}
+
+.vapor-article-card {
+  transition: all 0.3s ease;
+}
+
+.vapor-article-card:hover {
+  animation: rgb-separation 0.5s ease-in-out;
+  transform: translateY(-5px);
+}
+
+/* ============================================
+   左右两侧流动动画元素
+   ============================================ */
+
+@keyframes float-up-down {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-100px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes float-down-up {
+  0% {
+    transform: translateY(-100px) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(100vh) rotate(-360deg);
+    opacity: 0;
+  }
+}
+
+.vapor-floating-side-element {
+  position: fixed;
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+  filter: drop-shadow(0 0 10px var(--vapor-pink));
+  font-size: 3rem;
+  opacity: 0.6;
+}
+
+.vapor-floating-side-element-float-up {
+  animation: float-up-down 20s linear infinite;
+}
+
+.vapor-floating-side-element-float-down {
+  animation: float-down-up 25s linear infinite;
+}
+
+/* 不同大小的元素 */
+.vapor-floating-small {
+  font-size: 2rem;
+  filter: drop-shadow(0 0 8px var(--vapor-cyan));
+}
+
+.vapor-floating-medium {
+  font-size: 3rem;
+  filter: drop-shadow(0 0 10px var(--vapor-pink));
+}
+
+.vapor-floating-large {
+  font-size: 4rem;
+  filter: drop-shadow(0 0 12px var(--vapor-purple));
+}
+
+/* 不同颜色的元素 */
+.vapor-floating-pink {
+  color: var(--vapor-pink);
+  filter: drop-shadow(0 0 10px var(--vapor-pink));
+}
+
+.vapor-floating-cyan {
+  color: var(--vapor-cyan);
+  filter: drop-shadow(0 0 10px var(--vapor-cyan));
+}
+
+.vapor-floating-purple {
+  color: var(--vapor-purple);
+  filter: drop-shadow(0 0 10px var(--vapor-purple));
+}
+
+.vapor-floating-rainbow {
+  background: var(--vapor-gradient-rainbow);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-flow 3s ease infinite, float-up-down 20s linear infinite;
+  filter: drop-shadow(0 0 10px var(--vapor-pink));
+}
+
+/* ============================================
+   Windows 95风格侧边菜单
+   ============================================ */
+
+/* 80年代电脑桌面图案 */
+.vapor-win95-desktop-bg {
+  background: 
+    /* 网格图案 */
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.05) 2px,
+      rgba(0, 0, 0, 0.05) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.05) 2px,
+      rgba(0, 0, 0, 0.05) 4px
+    ),
+    /* 基础颜色 - 80年代电脑桌面 */
+    linear-gradient(135deg, #008080 0%, #004080 50%, #008080 100%);
+}
+
+:root {
+  --vapor-win95-desktop-bg: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.05) 2px,
+      rgba(0, 0, 0, 0.05) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.05) 2px,
+      rgba(0, 0, 0, 0.05) 4px
+    ),
+    linear-gradient(135deg, #008080 0%, #004080 50%, #008080 100%);
+  background-size: 8px 8px, 8px 8px, 100% 100%;
+  image-rendering: pixelated;
+}
+
+/* Windows 95开始菜单样式 */
+.vapor-win95-menu {
+  width: 280px;
+  max-height: 80vh;
+  background: #c0c0c0;
+  border: 2px outset #c0c0c0;
+  box-shadow: 
+    inset -1px -1px 0px #000,
+    inset 1px 1px 0px #fff,
+    0 4px 8px rgba(0, 0, 0, 0.3);
+  font-family: 'MS Sans Serif', sans-serif;
+  font-size: 11px;
+  z-index: 1000;
+  overflow: hidden;
+  image-rendering: pixelated;
+}
+
+/* 菜单标题栏 */
+.vapor-win95-menu-header {
+  background: linear-gradient(180deg, #0a246a 0%, #000080 100%);
+  color: white;
+  padding: 4px 8px;
+  font-weight: bold;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #000;
+}
+
+/* 菜单内容区域 - 带桌面图案背景 */
+.vapor-win95-menu-content {
+  background: 
+    /* 静态噪点 */
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.02) 0px, transparent 1px, transparent 2px, rgba(0, 0, 0, 0.02) 3px),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.02) 0px, transparent 1px, transparent 2px, rgba(0, 0, 0, 0.02) 3px),
+    /* 失真效果 */
+    repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255, 0, 255, 0.03) 3px, rgba(0, 255, 255, 0.03) 4px),
+    /* 网格图案 */
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.05) 2px, rgba(0, 0, 0, 0.05) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0, 0, 0, 0.05) 2px, rgba(0, 0, 0, 0.05) 4px),
+    /* 基础颜色 - 80年代电脑桌面 */
+    linear-gradient(135deg, #008080 0%, #004080 50%, #008080 100%);
+  background-size: 4px 4px, 4px 4px, 8px 8px, 8px 8px, 8px 8px, 100% 100%;
+  padding: 4px;
+  position: relative;
+  overflow-y: auto;
+  max-height: calc(80vh - 30px);
+  image-rendering: pixelated;
+}
+
+
+/* 菜单项 */
+.vapor-win95-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  margin: 2px 0;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  position: relative;
+  z-index: 3;
+  color: #000;
+  font-size: 11px;
+  transition: all 0.1s ease;
+}
+
+.vapor-win95-menu-item:hover {
+  background: #000080;
+  color: white;
+  border: 1px dotted #fff;
+}
+
+.vapor-win95-menu-item.active {
+  background: #000080;
+  color: white;
+  border: 1px solid #fff;
+}
+
+/* 像素风图标 */
+.vapor-pixel-icon {
+  width: 16px;
+  height: 16px;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  flex-shrink: 0;
+  font-size: 16px;
+  line-height: 16px;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Courier New', monospace;
+}
+
+/* 磁带播放器进度条效果 - 选中项 */
+@keyframes tape-progress {
+  0% {
+    background-position: 0% 0;
+  }
+  100% {
+    background-position: 100% 0;
+  }
+}
+
+.vapor-win95-menu-item.active::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--vapor-pink) 0%,
+    var(--vapor-cyan) 25%,
+    var(--vapor-purple) 50%,
+    var(--vapor-blue) 75%,
+    var(--vapor-pink) 100%
+  );
+  background-size: 200% 100%;
+  animation: tape-progress 2s linear infinite;
+  box-shadow: 0 0 5px var(--vapor-pink);
+  z-index: 4;
+}
+
+/* 菜单分隔线 */
+.vapor-win95-menu-divider {
+  height: 1px;
+  background: #808080;
+  margin: 4px 8px;
+  border-top: 1px solid #fff;
+  position: relative;
+  z-index: 3;
+}
+
+/* 菜单项文字 */
+.vapor-win95-menu-item-text {
+  flex: 1;
+  font-weight: normal;
+}
+
+.vapor-win95-menu-item:hover .vapor-win95-menu-item-text,
+.vapor-win95-menu-item.active .vapor-win95-menu-item-text {
+  font-weight: bold;
+}
+
+/* 菜单项右侧箭头 */
+.vapor-win95-menu-arrow {
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+/* ============================================
+   原有样式保留
+   ============================================ */
+
+/* Rainbow text animation for "梦幻彩虹" name color */
+@keyframes rainbow {
+  0% { color: #ff0000; }
+  16.66% { color: #ff7f00; }
+  33.33% { color: #ffff00; }
+  50% { color: #00ff00; }
+  66.66% { color: #0000ff; }
+  83.33% { color: #4b0082; }
+  100% { color: #ff0000; }
+}
+
+.rainbow-text {
+  animation: rainbow 3s linear infinite;
+  background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #ff0000);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: rainbow-gradient 3s linear infinite;
+}
+
+
+
+
+
+
