@@ -5,10 +5,6 @@
   "name": "0606",
   "compatibility_date": "2025-12-10",
   "pages_build_output_dir": ".next", // 核心：告诉Cloudflare你的Next.js构建输出文件夹
-  "pages_build": {
-    "command": "npm run build",
-    "output_dir": ".next"
-  },
   "vars": {
     // 这里设置的环境变量会在你的Next.js应用运行时（包括API路由）生效
     // 注意：Next.js 需要 NEXT_PUBLIC_ 前缀才能在客户端访问
