@@ -81,10 +81,12 @@
 - **Framework preset**: None（或 Next.js）
 - **Build command**: `npm run build:cloudflare`
 - **Build output directory**: `.vercel/output/static`
-- **Root directory**: `/`（项目根目录）
+- **Root directory**: **留空**（不要填写任何内容，包括 `/`）
 - **Deploy command**: 
   - **如果允许留空**：留空
   - **如果不允许留空**：使用 `echo "Deploy handled by Cloudflare Pages"` 或 `true`
+
+**重要**：Root directory 字段必须**留空**，不要填写 `/` 或其他路径。Cloudflare Pages 会自动使用仓库根目录。
 
 ### 备选配置（标准 Next.js 构建）
 
@@ -93,10 +95,12 @@
 - **Framework preset**: Next.js
 - **Build command**: `npm run build`
 - **Build output directory**: `.next`
-- **Root directory**: `/`（项目根目录）
+- **Root directory**: **留空**（不要填写任何内容）
 - **Deploy command**: 
   - **如果允许留空**：留空
   - **如果不允许留空**：使用 `echo "Deploy handled by Cloudflare Pages"` 或 `true`
+
+**重要**：Root directory 字段必须**留空**，不要填写 `/` 或其他路径。
 
 ## 常见问题
 
@@ -124,7 +128,22 @@
 - 确保构建输出目录正确设置为 `.next`
 - Cloudflare Pages 会在构建完成后自动部署
 
-### 4. Deploy command 字段不能留空
+### 4. "Failed: root directory not found" 错误
+
+**原因**：在 Cloudflare Pages 控制台的 **Root directory** 字段中填写了错误的路径（如 `/` 或其他不存在的路径）。
+
+**解决方案**：
+1. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com/)
+2. 进入 **Pages** → 项目 **0606**
+3. 点击 **Settings** → **Builds & deployments**
+4. 找到 **Root directory** 字段
+5. **将该字段完全清空**（不要填写 `/` 或任何其他路径）
+6. 保存设置
+7. 重新触发部署
+
+**重要**：Root directory 字段应该**留空**，Cloudflare Pages 会自动使用 Git 仓库的根目录。
+
+### 5. Deploy command 字段不能留空
 
 **原因**：Cloudflare Pages 可能要求该字段必须有值。
 
@@ -136,7 +155,23 @@
 
 这些命令会立即返回成功（退出码 0），不会执行任何实际部署操作，因为 Cloudflare Pages 会在构建完成后自动处理部署。
 
-### 5. 部署后显示 "Hello World" 而不是 Next.js 应用
+### 6. "@cloudflare/next-on-pages" 版本不存在错误
+
+**原因**：`package.json` 中指定的版本号不存在。
+
+**解决方案**：
+- 已更新为正确的版本号：`@cloudflare/next-on-pages@^1.13.16`
+- 如果将来需要更新，可以运行 `npm view @cloudflare/next-on-pages versions` 查看可用版本
+
+### 7. Next.js 版本不兼容错误
+
+**原因**：`@cloudflare/next-on-pages@1.13.16` 需要 Next.js `>=14.3.0 && <=15.5.2`，但项目使用的是 `next@14.2.x`。
+
+**解决方案**：
+- 已升级 Next.js 到 `^14.3.0` 以满足适配器的版本要求
+- 同时更新了 `eslint-config-next` 到 `^14.3.0` 以保持一致性
+
+### 8. 部署后显示 "Hello World" 而不是 Next.js 应用
 
 **原因**：Cloudflare Pages 没有正确识别 Next.js 应用，需要使用 Cloudflare Next.js 适配器。
 
@@ -144,7 +179,7 @@
 
 #### 方案 A：使用 Cloudflare Next.js 适配器（推荐）
 
-1. **已安装适配器**：项目已配置 `@cloudflare/next-on-pages`
+1. **已安装适配器**：项目已配置 `@cloudflare/next-on-pages@^1.13.16`（最新稳定版本）
 
 2. **更新 Cloudflare Pages 构建配置**：
    在 Cloudflare Pages 控制台的 **Settings** → **Builds & deployments** 中：
