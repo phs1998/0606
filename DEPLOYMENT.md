@@ -167,11 +167,12 @@
 
 ### 7. Next.js 版本不兼容错误
 
-**原因**：`@cloudflare/next-on-pages@1.13.16` 需要 Next.js `>=14.3.0 && <=15.5.2`，但项目使用的是 `next@14.2.x`。
+**原因**：`@cloudflare/next-on-pages@1.13.16` 需要 Next.js `>=14.3.0 && <=15.5.2`，但 Next.js 14.3.0 只有 canary 版本，没有稳定版本。
 
 **解决方案**：
-- 已升级 Next.js 到 `^14.3.0` 以满足适配器的版本要求
-- `eslint-config-next` 保持在 `^14.2.0`（与 Next.js 14.3.0 兼容）
+- 使用 `@cloudflare/next-on-pages@1.12.1`，该版本与 Next.js 14.2.x 兼容
+- Next.js 保持在 `^14.2.0`（使用最新的 14.2.33 稳定版本）
+- `eslint-config-next` 保持在 `^14.2.0`（与 Next.js 14.2.x 匹配）
 - 已在项目根目录创建 `.npmrc` 文件，配置了 `legacy-peer-deps=true`
 - 这样 Cloudflare Pages 在运行 `npm clean-install` 时会自动使用 `--legacy-peer-deps` 标志，解决依赖版本冲突问题
 - 构建命令可以简化为 `npm run build:cloudflare`，因为依赖安装会自动使用 `.npmrc` 配置
