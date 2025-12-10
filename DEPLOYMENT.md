@@ -74,9 +74,23 @@
 
 ## 构建配置
 
+### 推荐配置（使用 Cloudflare Next.js 适配器）
+
 在 Cloudflare Pages 控制台的 **Settings** → **Builds & deployments** 中配置：
 
-- **Framework preset**: Next.js（或 None）
+- **Framework preset**: None（或 Next.js）
+- **Build command**: `npm run build:cloudflare`
+- **Build output directory**: `.vercel/output/static`
+- **Root directory**: `/`（项目根目录）
+- **Deploy command**: 
+  - **如果允许留空**：留空
+  - **如果不允许留空**：使用 `echo "Deploy handled by Cloudflare Pages"` 或 `true`
+
+### 备选配置（标准 Next.js 构建）
+
+如果适配器方案有问题，可以尝试：
+
+- **Framework preset**: Next.js
 - **Build command**: `npm run build`
 - **Build output directory**: `.next`
 - **Root directory**: `/`（项目根目录）
@@ -124,18 +138,22 @@
 
 ### 5. 部署后显示 "Hello World" 而不是 Next.js 应用
 
-**原因**：Cloudflare Pages 没有正确识别 Next.js 应用的路由，可能因为：
-- 根目录或 `public/` 目录下有 `index.html` 文件覆盖了 Next.js 路由
-- 缺少 `functions/_routes.json` 配置文件
+**原因**：Cloudflare Pages 没有正确识别 Next.js 应用，需要使用 Cloudflare Next.js 适配器。
 
 **解决方案**：
 
-1. **检查并删除冲突的 index.html**：
-   - 检查项目根目录下是否有 `index.html`，如果有请删除或重命名（如 `index.html.bak`）
-   - 检查 `public/` 目录下是否有 `index.html`，如果有也请移除
+#### 方案 A：使用 Cloudflare Next.js 适配器（推荐）
 
-2. **创建 functions/_routes.json 配置**：
-   在项目根目录下创建 `functions` 文件夹（如果不存在），然后在其中创建 `_routes.json` 文件：
+1. **已安装适配器**：项目已配置 `@cloudflare/next-on-pages`
+
+2. **更新 Cloudflare Pages 构建配置**：
+   在 Cloudflare Pages 控制台的 **Settings** → **Builds & deployments** 中：
+   - **Build command**: `npm run build:cloudflare`
+   - **Build output directory**: `.vercel/output/static`
+   - **Framework preset**: None（或 Next.js）
+
+3. **确保 functions/_routes.json 存在**：
+   已在项目根目录创建 `functions/_routes.json`：
    ```json
    {
      "version": 1,
@@ -143,15 +161,25 @@
      "exclude": ["/static/*"]
    }
    ```
-   
-   这个配置文件告诉 Cloudflare Pages：
-   - `"include": ["/*"]`：所有请求都由 Next.js 应用处理
-   - `"exclude": ["/static/*"]`：排除静态资源路径，提升性能
 
-3. **重新部署**：
+4. **重新部署**：
    - 提交更改到 Git 仓库
    - Cloudflare Pages 会自动重新构建和部署
-   - 或者手动触发重新部署
+
+#### 方案 B：如果方案 A 不工作，尝试标准 Next.js 构建
+
+如果适配器方案有问题，可以尝试：
+
+1. **在 Cloudflare Pages 控制台配置**：
+   - **Build command**: `npm run build`
+   - **Build output directory**: `.next`
+   - **Framework preset**: Next.js
+
+2. **确保 functions/_routes.json 存在**（已创建）
+
+3. **检查并删除冲突的 index.html**：
+   - 检查项目根目录下是否有 `index.html`，如果有请删除
+   - 检查 `public/` 目录下是否有 `index.html`，如果有也请移除
 
 ## 注意事项
 
