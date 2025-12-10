@@ -79,14 +79,16 @@
 在 Cloudflare Pages 控制台的 **Settings** → **Builds & deployments** 中配置：
 
 - **Framework preset**: None（或 Next.js）
-- **Build command**: `npm run build:cloudflare`
+- **Build command**: `npm install --legacy-peer-deps && npm run build:cloudflare`
 - **Build output directory**: `.vercel/output/static`
 - **Root directory**: **留空**（不要填写任何内容，包括 `/`）
 - **Deploy command**: 
   - **如果允许留空**：留空
   - **如果不允许留空**：使用 `echo "Deploy handled by Cloudflare Pages"` 或 `true`
 
-**重要**：Root directory 字段必须**留空**，不要填写 `/` 或其他路径。Cloudflare Pages 会自动使用仓库根目录。
+**重要**：
+- Root directory 字段必须**留空**，不要填写 `/` 或其他路径。Cloudflare Pages 会自动使用仓库根目录。
+- 如果遇到依赖解析错误，可以在 Cloudflare Pages 控制台的 **Settings** → **Builds & deployments** 中，找到 **Environment variables**，添加 `NPM_CONFIG_LEGACY_PEER_DEPS=true` 环境变量，或者在构建命令前添加 `npm install --legacy-peer-deps &&`。
 
 ### 备选配置（标准 Next.js 构建）
 
@@ -169,7 +171,9 @@
 
 **解决方案**：
 - 已升级 Next.js 到 `^14.3.0` 以满足适配器的版本要求
-- 同时更新了 `eslint-config-next` 到 `^14.3.0` 以保持一致性
+- `eslint-config-next` 保持在 `^14.2.0`（与 Next.js 14.3.0 兼容）
+- 构建命令已更新为：`npm install --legacy-peer-deps && npm run build:cloudflare`，这会使用 `--legacy-peer-deps` 标志来安装依赖，避免版本冲突
+- 或者，您也可以在 Cloudflare Pages 的环境变量中添加 `NPM_CONFIG_LEGACY_PEER_DEPS=true`，然后使用原来的构建命令 `npm run build:cloudflare`
 
 ### 8. 部署后显示 "Hello World" 而不是 Next.js 应用
 
