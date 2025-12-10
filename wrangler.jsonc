@@ -1,0 +1,15 @@
+// wrangler.jsonc
+
+{
+  "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json",
+  "name": "your-community-site", // 可以改为你的项目名
+  "compatibility_date": "2025-12-10",
+  "pages_build_output_dir": ".next", // 核心：告诉Cloudflare你的Next.js构建输出文件夹
+  "vars": {
+    // 这里设置的环境变量会在你的Next.js应用运行时（包括API路由）生效
+    // 注意：Next.js 需要 NEXT_PUBLIC_ 前缀才能在客户端访问
+    "NEXT_PUBLIC_SUPABASE_URL": "https://fjnqqtkflfurnmhfycwe.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqbnFxdGtmbGZ1cm5taGZ5Y3dlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzU3NjUsImV4cCI6MjA4MDc1MTc2NX0.Hs3IQW0KrEOQSNGDjwcjey5CR9Je0DbGsqrdtKvaCuo"
+  }
+}
+
