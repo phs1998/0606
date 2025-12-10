@@ -65,14 +65,14 @@ export async function GET(
         id: article.id,
         title: article.title,
         content: article.content,
-        user: article.users ? {
-          id: article.users.id,
-          username: article.users.username,
-          avatar_url: article.users.avatar_url,
-          registration_number: article.users.registration_number,
-          exp: article.users.exp || 0,
-          equipped_avatar_frame_id: article.users.equipped_avatar_frame_id,
-          unlocked_name_color_id: article.users.unlocked_name_color_id,
+        user: article.users?.[0] ? {
+          id: article.users[0].id,
+          username: article.users[0].username,
+          avatar_url: article.users[0].avatar_url,
+          registration_number: article.users[0].registration_number,
+          exp: article.users[0].exp || 0,
+          equipped_avatar_frame_id: article.users[0].equipped_avatar_frame_id,
+          unlocked_name_color_id: article.users[0].unlocked_name_color_id,
         } : null,
         like_count: article.like_count || 0,
         comment_count: article.comment_count || 0,
@@ -86,6 +86,7 @@ export async function GET(
     return errorResponse('服务器错误，请稍后重试', 'SERVER_ERROR', 500)
   }
 }
+
 
 
 

@@ -430,10 +430,8 @@ export default function ProfileClient({
                       alt="头像预览"
                       className="w-24 h-24 rounded-full object-cover border-2 border-gray-200"
                       style={{
-                        imageRendering: 'high-quality',
-                        WebkitImageRendering: '-webkit-optimize-contrast',
-                        msImageRendering: 'crisp-edges',
-                      }}
+                        imageRendering: 'auto' as const,
+                      } as React.CSSProperties}
                       loading="eager"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement

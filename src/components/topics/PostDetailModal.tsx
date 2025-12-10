@@ -31,10 +31,10 @@ export default function PostDetailModal({
   const [replyingTo, setReplyingTo] = useState<string | null>(null) // Comment ID being replied to
   const [replyContent, setReplyContent] = useState<Record<string, string>>({}) // Reply content for each comment
 
-  const formatTime = (timestamp) => {
+  const formatTime = (timestamp: string | number | Date) => {
     const date = new Date(timestamp)
     const now = new Date()
-    const diff = now - date
+    const diff = now.getTime() - date.getTime()
 
     if (diff < 60000) return '刚刚'
     if (diff < 3600000) return `${Math.floor(diff / 60000)}分钟前`
@@ -397,7 +397,7 @@ export default function PostDetailModal({
                           ›
                         </button>
                         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-                          {post.image_urls.map((_, index) => (
+                          {post.image_urls.map((_: string, index: number) => (
                             <button
                               key={index}
                               onClick={() => setCurrentImageIndex(index)}
@@ -471,7 +471,7 @@ export default function PostDetailModal({
                     className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   />
                   <button
-                    onClick={handleSubmitComment}
+                    onClick={() => handleSubmitComment()}
                     disabled={submittingComment || !commentContent.trim()}
                     className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
