@@ -222,7 +222,30 @@ export default function AuthPage() {
         }),
       })
 
-      const data = await response.json()
+      // 检查响应状态
+      if (response.status === 404) {
+        setError('注册接口未找到，请检查服务器配置')
+        console.error('注册接口返回 404，可能的原因：')
+        console.error('1. 路由文件未正确部署')
+        console.error('2. Next.js 构建时排除了该路由')
+        console.error('3. Vercel 部署配置问题')
+        return
+      }
+
+      // 尝试解析 JSON 响应
+      let data
+      try {
+        const text = await response.text()
+        if (!text) {
+          setError('服务器返回空响应')
+          return
+        }
+        data = JSON.parse(text)
+      } catch (parseError) {
+        console.error('解析响应失败:', parseError)
+        setError('服务器响应格式错误')
+        return
+      }
 
       if (response.ok && data.success) {
         // Store token in sessionStorage (cleared when tab closes)
@@ -245,10 +268,19 @@ export default function AuthPage() {
         router.push('/home')
       } else {
         setError(data.error || '注册失败')
+        console.error('注册失败:', {
+          status: response.status,
+          error: data.error,
+          code: data.code,
+        })
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('注册错误:', err)
-      setError('网络错误，请稍后重试')
+      if (err.message?.includes('Failed to fetch') || err.message?.includes('NetworkError')) {
+        setError('网络连接失败，请检查网络连接')
+      } else {
+        setError('网络错误，请稍后重试')
+      }
     } finally {
       setLoading(false)
     }

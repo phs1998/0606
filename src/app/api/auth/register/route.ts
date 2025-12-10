@@ -8,27 +8,49 @@ import { successResponse, errorResponse } from '@/lib/utils/response'
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
+  // 添加调试日志
+  console.log('=== 注册请求收到 ===')
+  console.log('Request URL:', request.url)
+  console.log('Request method:', request.method)
+  
   try {
     // 验证环境变量（记录详细信息以便调试）
     const missingVars: string[] = []
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    const envCheck = {
+      NEXT_PUBLIC_SUPABASE_URL: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      JWT_SECRET: !!process.env.JWT_SECRET,
+      SUPABASE_SERVICE_ROLE_KEY: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+    }
+    
+    console.log('环境变量检查:', envCheck)
+    
+    if (!envCheck.NEXT_PUBLIC_SUPABASE_URL) {
       missingVars.push('NEXT_PUBLIC_SUPABASE_URL')
     }
-    if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    if (!envCheck.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
       missingVars.push('NEXT_PUBLIC_SUPABASE_ANON_KEY')
     }
-    if (!process.env.JWT_SECRET) {
+    if (!envCheck.JWT_SECRET) {
       missingVars.push('JWT_SECRET')
     }
     
     if (missingVars.length > 0) {
-      console.error('缺少环境变量:', missingVars.join(', '))
-      console.error('当前环境:', {
-        NODE_ENV: process.env.NODE_ENV,
-        VERCEL: process.env.VERCEL,
-        VERCEL_ENV: process.env.VERCEL_ENV,
-      })
-      return errorResponse('服务器配置错误，请稍后重试', 'CONFIG_ERROR', 500)
+      const errorDetails = {
+        missingVars,
+        envCheck,
+        environment: {
+          NODE_ENV: process.env.NODE_ENV,
+          VERCEL: process.env.VERCEL,
+          VERCEL_ENV: process.env.VERCEL_ENV,
+        },
+      }
+      console.error('缺少环境变量:', JSON.stringify(errorDetails, null, 2))
+      return errorResponse(
+        `服务器配置错误：缺少必需的环境变量 (${missingVars.join(', ')})。请检查 Vercel 环境变量配置。`,
+        'CONFIG_ERROR',
+        500
+      )
     }
 
     // 检查是否使用了 service role key（推荐用于服务端操作）
