@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/contexts/AuthContext'
-import ConditionalNavbar from '@/components/layout/ConditionalNavbar'
+import ConditionalAppLayout from '@/components/layout/ConditionalAppLayout'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -20,8 +20,9 @@ export default function RootLayout({
     <html lang="zh-CN">
       <body className={inter.className}>
         <AuthProvider>
-          <ConditionalNavbar />
-          <main>{children}</main>
+          <ConditionalAppLayout>
+            {children}
+          </ConditionalAppLayout>
         </AuthProvider>
       </body>
     </html>

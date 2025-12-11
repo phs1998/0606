@@ -6,7 +6,6 @@ import { useAuth } from '@/contexts/AuthContext'
 import ImageUploader from '@/components/ImageUploader'
 import { revalidateProfileCache } from './actions'
 import PreviewModal from '@/components/PreviewModal'
-import { BACKGROUND_OPTIONS, getBackgroundById } from '@/lib/backgrounds'
 
 interface UserProfileResponse {
   user: {
@@ -56,19 +55,6 @@ export default function ProfileClient({
 
   const [profileData, setProfileData] = useState<UserProfileResponse>(initialProfileData)
   const [bio, setBio] = useState(initialProfileData.profile?.bio || '')
-  
-  // Background image selection
-  // 如果background_image_url是null或undefined，使用'default'
-  // 如果是空字符串，也使用'default'
-  // 否则使用实际的背景ID
-  const getInitialBackgroundId = () => {
-    const bgId = initialProfileData.profile?.background_image_url
-    if (!bgId || (typeof bgId === 'string' && bgId.trim() === '')) {
-      return 'default'
-    }
-    return bgId
-  }
-  const [selectedBackgroundId, setSelectedBackgroundId] = useState<string>(getInitialBackgroundId())
   
   // Original data (from server)
   const [avatarUrl, setAvatarUrl] = useState(initialProfileData.user?.avatar_url || '')
@@ -146,9 +132,6 @@ export default function ProfileClient({
           setProfileData(profileResult.data)
           setBio(profileResult.data.profile?.bio || '')
           setAvatarUrl(profileResult.data.user?.avatar_url || '')
-          // 正确读取背景ID：null或空字符串时使用'default'，否则使用实际ID
-          const bgId = profileResult.data.profile?.background_image_url
-          setSelectedBackgroundId((bgId && bgId.trim()) || 'default')
         }
       }
 
@@ -178,7 +161,6 @@ export default function ProfileClient({
       const updateData: any = {
         bio: bio.trim(),
         avatar_url: avatarFile || avatarUrl || null,
-        background_image_id: selectedBackgroundId === 'default' ? null : selectedBackgroundId,
       }
 
       const response = await fetch('/api/user/profile', {
@@ -204,19 +186,22 @@ export default function ProfileClient({
         if (result.data?.profile?.bio !== undefined) {
           setBio(result.data.profile.bio || '')
         }
-        // Update background ID
-        // 正确读取背景ID：null或空字符串时使用'default'，否则使用实际ID
-        if (result.data?.profile?.background_image_url !== undefined) {
-          const bgId = result.data.profile.background_image_url
-          setSelectedBackgroundId((bgId && bgId.trim()) || 'default')
-        }
-        
         // Clear temporary states
         setAvatarFile(null)
         
         await revalidateProfileCache()
         await refreshUser()
         await reloadData()
+        
+        // 触发 storage 事件，通知其他页面（如主页）刷新头像
+        // 同时触发自定义事件，通知当前页面的组件刷新
+        if (result.data?.user?.avatar_url !== undefined) {
+          window.localStorage.setItem('avatar_updated', Date.now().toString())
+          window.localStorage.removeItem('avatar_updated')
+          // 触发自定义事件，通知当前页面的 AvatarWithFrame 组件刷新
+          window.dispatchEvent(new Event('avatar_updated'))
+        }
+        
         setTimeout(() => setSuccess(false), 3000)
       } else {
         if (response.status === 429) {
@@ -268,7 +253,7 @@ export default function ProfileClient({
   const equippedFrameId = profileData?.user?.equipped_avatar_frame_id
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12">
+    <div style={{ padding: '24px', paddingLeft: '32px', paddingRight: '32px' }}>
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-8">个人资料</h1>
@@ -324,80 +309,6 @@ export default function ProfileClient({
                 />
               </div>
 
-              {/* Background Selection */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">个人主页背景</label>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
-                  {BACKGROUND_OPTIONS.map((bg) => {
-                    const isSelected = selectedBackgroundId === bg.id
-                    const bgUrl = bg.url || null
-                    
-                    return (
-                      <div
-                        key={bg.id}
-                        onClick={() => setSelectedBackgroundId(bg.id)}
-                        className={`relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
-                          isSelected
-                            ? 'border-indigo-600 ring-2 ring-indigo-500'
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}
-                        style={{
-                          aspectRatio: '16/9',
-                          minHeight: '100px',
-                        }}
-                      >
-                        {bgUrl ? (
-                          <>
-                            <img
-                              loading="lazy"
-                              src={bgUrl}
-                              alt={bg.name}
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                // 如果图片加载失败，显示默认背景
-                                const target = e.target as HTMLImageElement
-                                target.style.display = 'none'
-                                if (target.parentElement) {
-                                  target.parentElement.style.background = 'var(--vapor-gradient-pink-purple)'
-                                }
-                              }}
-                            />
-                            {isSelected && (
-                              <div className="absolute inset-0 bg-indigo-600 bg-opacity-30 flex items-center justify-center">
-                                <span className="text-white font-bold text-sm">已选择</span>
-                              </div>
-                            )}
-                          </>
-                        ) : (
-                          // 默认背景预览（使用CSS渐变）
-                          <div
-                            className="w-full h-full"
-                            style={{
-                              background: `
-                                var(--grid-bg),
-                                var(--vapor-gradient-pink-purple)
-                              `,
-                              backgroundSize: '20px 20px, 100% 100%',
-                            }}
-                          >
-                            {isSelected && (
-                              <div className="absolute inset-0 bg-indigo-600 bg-opacity-30 flex items-center justify-center">
-                                <span className="text-white font-bold text-sm">已选择</span>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-xs p-1 text-center">
-                          {bg.name}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-                <p className="text-xs text-gray-500 mt-2">
-                  当前选择：{getBackgroundById(selectedBackgroundId).name}
-                </p>
-              </div>
 
               {/* Avatar Upload */}
               <div>

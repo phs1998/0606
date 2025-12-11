@@ -53,7 +53,7 @@ export default function AvatarWithFrame({ userId, size = 'md', className = '' })
         setLoading(true)
         setError(null)
 
-        const response = await fetch(`/api/user/avatar/${userId}`, {
+        const response = await fetch(`/api/user/avatar/${userId}?t=${Date.now()}`, {
           cache: 'no-store',
         })
 
@@ -78,6 +78,18 @@ export default function AvatarWithFrame({ userId, size = 'md', className = '' })
     }
 
     fetchAvatarData()
+
+    // 监听头像更新事件，强制刷新
+    const handleAvatarUpdate = () => {
+      if (userId) {
+        fetchAvatarData()
+      }
+    }
+
+    window.addEventListener('avatar_updated', handleAvatarUpdate)
+    return () => {
+      window.removeEventListener('avatar_updated', handleAvatarUpdate)
+    }
   }, [userId])
 
   if (loading) {
@@ -97,17 +109,21 @@ export default function AvatarWithFrame({ userId, size = 'md', className = '' })
   const usernameInitial = avatarData.username ? avatarData.username.charAt(0).toUpperCase() : '?'
 
   return (
-    <div className={`relative inline-block ${className}`} style={{ overflow: 'visible' }}> {/* Allow frame to overflow */}
+    <div className={`relative inline-block ${className}`} style={{ overflow: 'visible', lineHeight: 0 }}> {/* Allow frame to overflow */}
       {/* Avatar container */}
-      <div className={`relative ${currentSize.avatar} rounded-full overflow-hidden`}>
+      <div className={`relative ${currentSize.avatar} rounded-full overflow-hidden`} style={{ position: 'relative', display: 'block' }}>
         {/* User Avatar (bottom layer) */}
         {avatarData.avatarUrl ? (
           <img
             src={avatarData.avatarUrl}
             srcSet={`${avatarData.avatarUrl} 1x, ${avatarData.avatarUrl} 2x`}
             alt={avatarData.username || '用户头像'}
-            className="w-full h-full object-cover rounded-full"
+            className="w-full h-full rounded-full"
             style={{
+              objectFit: 'cover',
+              objectPosition: 'center',
+              width: '100%',
+              height: '100%',
               imageRendering: 'high-quality',
               WebkitImageRendering: '-webkit-optimize-contrast',
               msImageRendering: 'crisp-edges',

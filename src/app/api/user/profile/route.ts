@@ -219,7 +219,7 @@ export async function PUT(request: NextRequest) {
     const userId = currentUser.userId
 
     const body = await request.json()
-    const { bio, avatar_url, equipped_avatar_frame_id, unlocked_name_color_id, background_image_id } = body
+    const { bio, avatar_url, equipped_avatar_frame_id, unlocked_name_color_id } = body
 
     // First get current user info, including avatar and change count fields
     const { data: currentUserData, error: fetchUserError } = await supabaseAdmin
@@ -323,23 +323,6 @@ export async function PUT(request: NextRequest) {
       userUpdateData.unlocked_name_color_id = unlocked_name_color_id
     }
 
-    // Update background_image_id (存储背景ID，而不是完整URL)
-    if (background_image_id !== undefined) {
-      if (typeof background_image_id !== 'string' && background_image_id !== null) {
-        return errorResponse('background_image_id 必须是字符串或null', 'VALIDATION_ERROR', 400)
-      }
-      // 将背景ID存储到profile的background_image_url字段中（为了兼容现有结构）
-      // 如果background_image_id是空字符串，也转换为null
-      // 如果background_image_id是'default'，存储为null（表示使用默认背景）
-      // 否则存储实际的背景ID（如'vaporwave-stairs'）
-      if (background_image_id === 'default' || (typeof background_image_id === 'string' && background_image_id.trim() === '')) {
-        profileUpdateData.background_image_url = null
-      } else if (background_image_id) {
-        profileUpdateData.background_image_url = background_image_id.trim()
-      } else {
-        profileUpdateData.background_image_url = null
-      }
-    }
 
     // Update user_profiles table
     if (Object.keys(profileUpdateData).length > 0) {

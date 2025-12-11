@@ -41,7 +41,7 @@ export default async function ProfilePage() {
 
   if (!token) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 80px)' }}>
         <div className="p-8 text-center bg-white rounded-2xl shadow-xl max-w-md">
           <p className="text-gray-700 mb-4">请先登录以查看个人资料。</p>
           <a
@@ -277,7 +277,7 @@ export default async function ProfilePage() {
   } catch (error) {
     console.error('Profile page error:', error)
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 80px)' }}>
         <div className="p-8 text-center bg-white rounded-2xl shadow-xl max-w-md">
           <p className="text-red-600 mb-4">加载失败，请重试。</p>
           <p className="text-xs text-gray-500 mb-4">{error instanceof Error ? error.message : '未知错误'}</p>

@@ -5,7 +5,6 @@ import { useAuth } from '@/contexts/AuthContext'
 import { getAuthHeaders } from '@/lib/auth/client'
 import { useRouter } from 'next/navigation'
 import AvatarWithFrame from '@/components/AvatarWithFrame'
-import PostDetailModal from '@/components/topics/PostDetailModal'
 import ArticleDetailModal from '@/components/articles/ArticleDetailModal'
 
 interface Mention {
@@ -31,7 +30,6 @@ export default function MessagesPage() {
   const [mentions, setMentions] = useState<Mention[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [selectedPost, setSelectedPost] = useState<any>(null)
   const [selectedArticle, setSelectedArticle] = useState<string | null>(null)
 
   useEffect(() => {
@@ -141,39 +139,19 @@ export default function MessagesPage() {
     if (mention.notification_type === 'article_reply' && mention.article_id) {
       setSelectedArticle(mention.article_id)
     } else if ((mention.notification_type === 'post_reply' || mention.notification_type === 'comment_reply' || mention.notification_type === 'mention') && mention.post_id) {
-      // Fetch post data and open modal
-      try {
-        const response = await fetch(`/api/posts?post_id=${mention.post_id}`, {
-          headers: getAuthHeaders(),
-          credentials: 'include',
-        })
-        const data = await response.json()
-        if (response.ok && data.success && data.data.posts && data.data.posts.length > 0) {
-          setSelectedPost(data.data.posts[0])
-        } else {
-          // Fallback to navigation
-          router.push(`/topics?post=${mention.post_id}`)
-        }
-      } catch (err) {
-        console.error('加载帖子错误:', err)
-        // Fallback to navigation
-        router.push(`/topics?post=${mention.post_id}`)
-      }
+      // Topics page removed, just mark as read
+      console.log('Post notification clicked, but topics page is removed')
     }
   }
 
-  const handleLike = async (postId: string) => {
-    // This will be handled by PostDetailModal
-  }
-
-  const handleCommentAdded = (postId: string) => {
+  const handleCommentAdded = () => {
     // Reload mentions to show new notifications
     loadMentions()
   }
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 80px)' }}>
         <div className="text-gray-500">加载中...</div>
       </div>
     )
@@ -186,9 +164,9 @@ export default function MessagesPage() {
   const unreadCount = mentions.filter((m) => !m.is_read).length
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4 max-w-4xl">
-        <div className="bg-white rounded-xl shadow-lg p-6">
+    <div style={{ padding: '24px', paddingLeft: '32px', paddingRight: '32px' }}>
+      <div className="container mx-auto max-w-4xl">
+        <div className="rounded-xl shadow-lg p-6" style={{ backgroundColor: '#E6F3FF' }}>
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-2xl font-bold text-gray-800">消息通知</h1>
             {unreadCount > 0 && (
@@ -280,18 +258,48 @@ export default function MessagesPage() {
             </div>
           )}
         </div>
-      </div>
 
-      {/* Post Detail Modal */}
-      {selectedPost && (
-        <PostDetailModal
-          post={selectedPost}
-          onClose={() => setSelectedPost(null)}
-          currentUserId={user?.id}
-          onLike={handleLike}
-          onCommentAdded={handleCommentAdded}
-        />
-      )}
+        {/* Send Feedback Component */}
+        <div 
+          className="border border-slate-200 grid grid-cols-6 gap-2 rounded-xl p-2 text-sm"
+          style={{ marginTop: '100px', backgroundColor: '#E6F3FF', width: '50%', marginLeft: 'auto', marginRight: 'auto' }}
+        >
+          <h1 className="text-center text-lg font-bold col-span-6" style={{ color: '#475569' }}>纸飞机</h1>
+
+          <textarea 
+            placeholder="说点什么呗" 
+            className="bg-slate-100 text-slate-600 placeholder:text-slate-600 placeholder:opacity-50 border border-slate-200 col-span-6 resize-none outline-none rounded-lg p-2 duration-300 focus:border-slate-600"
+            style={{ height: '56px' }}
+          />
+
+          <button 
+            className="fill-slate-600 col-span-1 flex justify-center items-center rounded-lg p-2 duration-300 bg-slate-100 hover:border-slate-600 focus:fill-blue-200 focus:bg-blue-400 border border-slate-200"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 512 512">
+              <path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm177.6 62.1C192.8 334.5 218.8 352 256 352s63.2-17.5 78.4-33.9c9-9.7 24.2-10.4 33.9-1.4s10.4 24.2 1.4 33.9c-22 23.8-60 49.4-113.6 49.4s-91.7-25.5-113.6-49.4c-9-9.7-8.4-24.9 1.4-33.9s24.9-8.4 33.9 1.4zM144.4 208a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zm192-32a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"></path>
+            </svg>
+          </button>
+
+          <button 
+            className="fill-slate-600 col-span-1 flex justify-center items-center rounded-lg p-2 duration-300 bg-slate-100 hover:border-slate-600 focus:fill-blue-200 focus:bg-blue-400 border border-slate-200"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 512 512">
+              <path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zM174.6 384.1c-4.5 12.5-18.2 18.9-30.7 14.4s-18.9-18.2-14.4-30.7C146.9 319.4 198.9 288 256 288s109.1 31.4 126.6 79.9c4.5 12.5-2 26.2-14.4 30.7s-26.2-2-30.7-14.4C328.2 358.5 297.2 336 256 336s-72.2 22.5-81.4 48.1zM144.4 208a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zm192-32a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"></path>
+            </svg>
+          </button>
+
+          <span className="col-span-2"></span>
+
+          <button 
+            className="bg-slate-100 stroke-slate-600 border border-slate-200 col-span-2 flex justify-center rounded-lg p-2 duration-300 hover:border-slate-600 hover:text-white focus:stroke-blue-200 focus:bg-blue-400"
+          >
+            <svg fill="none" viewBox="0 0 24 24" height="30px" width="30px" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinejoin="round" strokeLinecap="round" strokeWidth="1.5" d="M7.39999 6.32003L15.89 3.49003C19.7 2.22003 21.77 4.30003 20.51 8.11003L17.68 16.6C15.78 22.31 12.66 22.31 10.76 16.6L9.91999 14.08L7.39999 13.24C1.68999 11.34 1.68999 8.23003 7.39999 6.32003Z"></path>
+              <path strokeLinejoin="round" strokeLinecap="round" strokeWidth="1.5" d="M10.11 13.6501L13.69 10.0601"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
 
       {/* Article Detail Modal */}
       {selectedArticle && (

@@ -1,11 +1,10 @@
 'use client'
 
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import AvatarWithFrame from '@/components/AvatarWithFrame'
 import ArticleList from '@/components/articles/ArticleList'
 import VaporwavePlayer from '@/components/music/VaporwavePlayer'
-import { getBackgroundUrl } from '@/lib/backgrounds'
 
 interface ProfilePreviewProps {
   user: {
@@ -58,104 +57,24 @@ export default function ProfilePreview({
   const useRainbowText = equippedNameColor?.name === '梦幻彩虹'
   const likesCount = Number(totalLikesReceived) || 0
 
-  // Background image URL - 支持新的背景选择系统
-  const bgImageUrl = useMemo(() => {
-    // 如果profile中有background_image_url，使用它（可能是旧的URL或新的背景ID）
-    const bgId = profile?.background_image_url
-    
-    // 如果background_image_url为null、undefined或空字符串，使用默认背景
-    if (!bgId || (typeof bgId === 'string' && bgId.trim() === '')) {
-      return null
-    }
-    
-    // 检查是否是旧的URL格式（以http开头）
-    if (typeof bgId === 'string' && bgId.startsWith('http')) {
-      // 旧的用户上传的背景图片URL，不再支持，返回null使用默认背景
-      return null
-    }
-    
-    // 使用新的背景系统（背景ID）
-    // getBackgroundUrl会处理'default'、null等情况，返回null使用默认CSS背景
-    const url = getBackgroundUrl(bgId)
-    return url
-  }, [profile?.background_image_url])
-
-  // Track image loading state (for error handling only)
-  const [imageError, setImageError] = useState(false)
-
-  // Preload background image to check for errors
-  useEffect(() => {
-    if (!bgImageUrl) {
-      setImageError(false)
-      return
-    }
-
-    let isMounted = true
-    setImageError(false)
-
-    const img = new Image()
-    
-    img.onload = () => {
-      if (isMounted) {
-        setImageError(false)
-      }
-    }
-    img.onerror = () => {
-      if (isMounted) {
-        setImageError(true)
-        console.error('背景图片加载失败:', bgImageUrl)
-      }
-    }
-    
-    // Start loading immediately
-    img.src = bgImageUrl
-
-    return () => {
-      isMounted = false
-      img.onload = null
-      img.onerror = null
-    }
-  }, [bgImageUrl])
-
-  // 构建背景样式
-  const backgroundStyle = useMemo(() => {
-    const baseStyle: React.CSSProperties = {
+  // 名片样式 - 使用淡黄色底色
+  const cardStyle = useMemo(() => {
+    return {
       border: '2px solid var(--vapor-pink)',
       boxShadow: 'var(--glow-pink), 0 8px 32px rgba(0, 0, 0, 0.3)',
       padding: '2rem',
       maxWidth: '100%',
       width: '100%',
       minHeight: '600px',
-      position: 'relative',
+      position: 'relative' as const,
+      backgroundColor: '#FFFBEB',
     }
-
-    if (bgImageUrl && !imageError) {
-      // 使用背景图片
-      return {
-        ...baseStyle,
-        backgroundImage: `url(${bgImageUrl})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }
-    } else {
-      // 使用默认的蒸汽波渐变背景
-      return {
-        ...baseStyle,
-        background: `
-          var(--grid-bg),
-          var(--vapor-gradient-pink-purple)
-        `,
-        backgroundSize: '20px 20px, 100% 100%',
-        backgroundPosition: '0 0, center',
-      }
-    }
-  }, [bgImageUrl, imageError])
+  }, [])
 
   return (
     <div 
       className="rounded-xl relative overflow-hidden vapor-lo-fi-noise"
-      style={backgroundStyle}
+      style={cardStyle}
     >
       {/* 浮动元素：古典雕塑、椰树、日文字符 */}
       <div className="vapor-floating-element vapor-floating-slow" style={{ top: '10%', left: '5%', fontSize: '3rem' }}>
