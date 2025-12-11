@@ -117,3 +117,5 @@ curl -X POST https://aoi.io/api/auth/register \
 2. 浏览器控制台的错误信息
 3. 确认环境变量是否都已设置
 
+
+

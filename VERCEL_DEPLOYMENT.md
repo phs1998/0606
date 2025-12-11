@@ -238,3 +238,5 @@ curl -X POST https://aoi.io/api/auth/register \
 3. 确认所有环境变量配置正确
 4. 尝试在本地环境测试（使用相同的环境变量）
 
+
+

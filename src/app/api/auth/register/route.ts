@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
 import { hashPassword } from '@/lib/auth/password'
 import { generateToken } from '@/lib/auth/jwt'
@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
   console.log('=== 注册请求收到 ===')
   console.log('Request URL:', request.url)
   console.log('Request method:', request.method)
+  console.log('Content-Type:', request.headers.get('content-type'))
   
   try {
     // 验证环境变量（记录详细信息以便调试）
@@ -23,7 +24,33 @@ export async function POST(request: NextRequest) {
       SUPABASE_SERVICE_ROLE_KEY: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
     }
     
-    console.log('环境变量检查:', envCheck)
+    // 记录环境变量状态（不记录实际值，只记录是否存在和长度）
+    const envStatus = {
+      NEXT_PUBLIC_SUPABASE_URL: {
+        exists: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+        length: process.env.NEXT_PUBLIC_SUPABASE_URL?.length || 0,
+        preview: process.env.NEXT_PUBLIC_SUPABASE_URL?.substring(0, 20) + '...' || 'N/A'
+      },
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: {
+        exists: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+        length: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.length || 0,
+      },
+      JWT_SECRET: {
+        exists: !!process.env.JWT_SECRET,
+        length: process.env.JWT_SECRET?.length || 0,
+      },
+      SUPABASE_SERVICE_ROLE_KEY: {
+        exists: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+        length: process.env.SUPABASE_SERVICE_ROLE_KEY?.length || 0,
+      },
+    }
+    
+    console.log('环境变量检查:', JSON.stringify(envStatus, null, 2))
+    console.log('运行环境:', {
+      NODE_ENV: process.env.NODE_ENV,
+      VERCEL: process.env.VERCEL,
+      VERCEL_ENV: process.env.VERCEL_ENV,
+    })
     
     if (!envCheck.NEXT_PUBLIC_SUPABASE_URL) {
       missingVars.push('NEXT_PUBLIC_SUPABASE_URL')
@@ -39,6 +66,7 @@ export async function POST(request: NextRequest) {
       const errorDetails = {
         missingVars,
         envCheck,
+        envStatus,
         environment: {
           NODE_ENV: process.env.NODE_ENV,
           VERCEL: process.env.VERCEL,
@@ -46,8 +74,39 @@ export async function POST(request: NextRequest) {
         },
       }
       console.error('缺少环境变量:', JSON.stringify(errorDetails, null, 2))
+      
+      // 提供更详细的错误信息
+      let errorMessage = `服务器配置错误：缺少必需的环境变量 (${missingVars.join(', ')})。\n\n`
+      errorMessage += `请检查 Vercel 环境变量配置：\n`
+      errorMessage += `1. 登录 Vercel Dashboard\n`
+      errorMessage += `2. 进入项目设置 > Environment Variables\n`
+      errorMessage += `3. 确保以下变量已配置到 Production 环境：\n`
+      missingVars.forEach(v => {
+        errorMessage += `   - ${v}\n`
+      })
+      errorMessage += `4. 配置后需要重新部署才能生效\n`
+      
       return errorResponse(
-        `服务器配置错误：缺少必需的环境变量 (${missingVars.join(', ')})。请检查 Vercel 环境变量配置。`,
+        errorMessage,
+        'CONFIG_ERROR',
+        500
+      )
+    }
+
+    // 检查环境变量值是否有效（不是占位符）
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL === 'https://placeholder.supabase.co') {
+      console.error('检测到占位符值 NEXT_PUBLIC_SUPABASE_URL')
+      return errorResponse(
+        '服务器配置错误：NEXT_PUBLIC_SUPABASE_URL 使用了占位符值。请在 Vercel 中配置正确的环境变量。',
+        'CONFIG_ERROR',
+        500
+      )
+    }
+    
+    if (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY === 'placeholder-key-for-build') {
+      console.error('检测到占位符值 NEXT_PUBLIC_SUPABASE_ANON_KEY')
+      return errorResponse(
+        '服务器配置错误：NEXT_PUBLIC_SUPABASE_ANON_KEY 使用了占位符值。请在 Vercel 中配置正确的环境变量。',
         'CONFIG_ERROR',
         500
       )
@@ -58,7 +117,19 @@ export async function POST(request: NextRequest) {
       console.warn('警告: 未设置 SUPABASE_SERVICE_ROLE_KEY，使用 anon key。这可能导致 RLS 策略问题。')
     }
 
-    const body = await request.json()
+    // 解析请求体
+    let body: any
+    try {
+      body = await request.json()
+      console.log('请求体解析成功')
+    } catch (jsonError: any) {
+      console.error('JSON解析错误:', {
+        error: jsonError.message,
+        name: jsonError.name,
+      })
+      return errorResponse('请求格式错误：无法解析JSON数据', 'INVALID_REQUEST', 400)
+    }
+
     const { username, email, password } = body
 
     // 验证必填字段
@@ -183,6 +254,9 @@ export async function POST(request: NextRequest) {
       console.error('创建用户资料失败:', profileError)
       // 即使资料创建失败，用户已经创建，所以继续执行
       // 可以考虑回滚用户创建，但为了简化，这里只记录错误
+      // 注意：用户资料可以在后续通过更新接口创建
+    } else {
+      console.log('用户资料创建成功')
     }
 
     // 生成JWT token
@@ -228,14 +302,38 @@ export async function POST(request: NextRequest) {
       message: error?.message,
       stack: error?.stack,
       name: error?.name,
+      type: typeof error,
     })
     
     // 处理 JSON 解析错误
-    if (error instanceof SyntaxError) {
-      return errorResponse('请求格式错误', 'INVALID_REQUEST', 400)
+    if (error instanceof SyntaxError || error.name === 'SyntaxError') {
+      console.error('JSON解析错误')
+      return errorResponse('请求格式错误：无法解析JSON数据', 'INVALID_REQUEST', 400)
     }
     
-    return errorResponse('服务器错误，请稍后重试', 'SERVER_ERROR', 500)
+    // 处理其他已知错误
+    if (error?.message?.includes('Unexpected token')) {
+      return errorResponse('请求格式错误：JSON格式不正确', 'INVALID_REQUEST', 400)
+    }
+    
+    // 确保返回正确的HTTP响应
+    try {
+      return errorResponse('服务器错误，请稍后重试', 'SERVER_ERROR', 500)
+    } catch (responseError) {
+      // 如果连错误响应都无法创建，返回最基本的响应
+      console.error('无法创建错误响应:', responseError)
+      return new NextResponse(
+        JSON.stringify({
+          success: false,
+          error: '服务器内部错误',
+          code: 'SERVER_ERROR',
+        }),
+        {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
+    }
   }
 }
 
